@@ -1,0 +1,39 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    RewriteCond %{HTTP_USER_AGENT} Googlebot
+    RewriteCond %{REQUEST_URI} (.+)/random$
+    RewriteRule . - [R=404]
+
+    RewriteCond %{HTTP_USER_AGENT} python-requests
+    RewriteCond %{REQUEST_URI} (.+)
+    RewriteRule . - [R=404]
+
+    # Block all user agents that start with a non-word character
+    RewriteCond %{HTTP_USER_AGENT} ^\W
+    RewriteCond %{REQUEST_URI} (.+)
+    RewriteRule . - [R=404]
+
+    # Block empty user agents
+    RewriteCond %{HTTP_USER_AGENT} ^$
+    RewriteCond %{REQUEST_URI} (.+)
+    RewriteRule . - [R=404]
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Handle Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
